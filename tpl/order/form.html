@@ -1,0 +1,119 @@
+<style type="text/css">
+	label, input, select, span { float:left; clear:left; }
+	span { color:red; margin-bottom:20px; }
+</style>
+
+<h1>Order From</h1>
+
+<form id="order" action="/order/form" method="post" name="order">
+	<span class="required">All Fields Required</span>
+
+	<label for="email">Email Address</label>
+	<input id="email" name="email" type="email" value="<?php echo @$this->data['order']['email']; ?>" />
+	<span id="email-error"><?php echo @$this->data['error']['email']; ?></span>
+
+	<label for="quantity">Quantity</label>
+	<input id="quantity" name="quantity" type="number" min="1" value="<?php echo @$this->data['order']['quantity']; ?>" />
+	<span id="quantity-error"><?php echo @$this->data['error']['quantity']; ?></span>
+	
+	<label for="color">Color</label>
+	<select id="color" name="color_id">
+		<option value="">Select Color</option>
+		<?php
+		foreach ($this->data['color'] as $color) {
+			$selected = (@$this->data['order']['color_id'] == $color['id']) ? 'selected="selected"' : '';
+			echo '<option value="'.$color['id'].'" '.$selected.'>'.$color['name'].'</option>';
+		}
+		?>
+	</select>
+	<span id="color-error"><?php echo @$this->data['error']['color_id']; ?></span>
+	
+	<label for="needed">Date Needed</label>
+	<input id="needed" name="needed" type="date" min="<?php echo date('Y-m-d', strtotime('+7 days')); ?>" value="<?php echo @$this->data['order']['needed']; ?>" />
+	<span id="needed-error"><?php echo @$this->data['error']['needed']; ?></span>
+	
+	<label for="type">Widget Type</label>
+	<select id="type" name="type_id">
+		<option value="">Select Widget Type</option>
+		<?php
+		foreach ($this->data['type'] as $type) {
+			$selected = (@$this->data['order']['type_id'] == $type['id']) ? 'selected="selected"' : '';
+			echo '<option value="'.$type['id'].'"'.$selected.'>'.$type['name'].'</option>';
+		}
+		?>
+	</select>
+	<span id="type-error"><?php echo @$this->data['error']['type_id']; ?></span>
+	
+	<input type="submit" value="Place Order" />
+</form>
+
+<script type="text/javascript">
+	document.getElementById('order').addEventListener('submit', function(e) {
+		var email = document.getElementById('email'),
+			emailError = document.getElementById('email-error'),
+			quantity = document.getElementById('quantity'),
+			quantityError = document.getElementById('quantity-error'),
+			color = document.getElementById('color'),
+			colorError = document.getElementById('color-error'),
+			needed = document.getElementById('needed'),
+			neededError = document.getElementById('needed-error'),
+			type = document.getElementById('type'),
+			typeError = document.getElementById('type-error'),
+			validEmail = /\S+@\S+\.\S+/,
+			today = new Date(),
+			nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7),
+			formattedNextWeek = nextWeek.getFullYear()+'-'+('0'+(nextWeek.getMonth()+1)).slice(-2)+'-'+('0'+(nextWeek.getDate()+1)).slice(-2),
+			error = false;
+			
+		emailError.innerHTML = quantityError.innerHTML = colorError.innerHTML = neededError .innerHTML = typeError.innerHTML = '';
+		
+		if (!validEmail.test(email.value)) {
+			emailError.innerHTML = 'Email is invalid';
+			error = true
+		}
+		
+		if (!email.value) {
+			emailError.innerHTML ='Email is required';
+			error = true;
+		}
+		
+		if (isNaN(quantity.value) || parseInt(quantity.value, 10) !== parseFloat(quantity.value)) {
+			quantityError.innerHTML = 'Quantity must be an integer';
+			error = true;
+		}
+		
+		if (parseInt(quantity.value) <= 0) {
+			quantityError.innerHTML = 'Quantity must be positive';
+			error = true;
+		}
+		
+		if (!quantity.value) {
+			quantityError.innerHTML = 'Quantity is required';
+			error = true;
+		}
+		
+		if (!color.value) {
+			colorError.innerHTML = 'Color is required';
+			error = true;
+		}
+		
+		if (needed.value < formattedNextWeek) {
+			neededError.innerHTML = 'Date Needed must be at least one week from today';
+			error = true;
+		}
+		
+		if (!needed.value) {
+			neededError.innerHTML = 'Date Needed is required';
+			error = true;
+		}
+		
+		if (!type.value) {
+			typeError.innerHTML = 'Widget Type is required';
+			error = true;
+		}
+		
+		if (error) {
+			e.preventDefault();
+		}
+	});
+</script>

@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+	DocumentRoot "C:/wamp/www/widget"
+	ServerName local.widget.com
+	<Directory "C:/wamp/www/widget">
+		allow from all
+		Options -Indexes
+		RewriteEngine On
+		RewriteRule ^(.*)/(.*)/(.*)$ index.php?controller=$1&action=$2&param1=$3 [QSA,L]
+		RewriteRule ^(.*)/(.*)$ index.php?controller=$1&action=$2 [QSA,L]
+		RewriteRule ^(.*)$ index.php?controller=$1 [QSA,L]
+	</Directory>
+</VirtualHost>

@@ -1,0 +1,64 @@
+<style type="text/css">
+	.error { color:red; }
+	.success { color:green; }
+</style>
+
+<h1>Order Admin</h1>
+
+<?php if (!$this->data['order']) { echo '<h2>No Orders.</h2>'; die; } ?>
+
+<ol>
+	<?php
+	foreach ($this->data['order'] as $order) {
+		echo '<li>';
+		echo	'<ul>';
+		echo		'<li>Email: '.$order['email'].'</li>';
+		echo		'<li>Quantity: '.$order['quantity'].'</li>';
+		echo		'<li>Type: '.$order['type_name'].'</li>';
+		echo		'<li>Color: '.$order['color_name'].'</li>';
+		echo		'<li>Needed: '.$order['needed'].'</li>';
+		
+		echo		'<li>Status: ';
+		echo			'<select name="'.$order['unique_id'].'">';
+		foreach ($this->data['status'] as $status) {
+			$selected = ($status['id'] == $order['status_id']) ? 'selected="selected"' : '';
+			echo		'<option value="'.$status['id'].'" '.$selected.'>'.$status['name'].'</option>';
+		}
+		echo			'</select>';
+		echo		'</li>';
+		
+		echo		'<li>Order: '.$order['unique_id'].'</li>';
+		echo	'</ul>';
+		echo '</li>';
+	}
+	?>
+</ol>
+
+<script type="text/javascript">
+	function getCookie(name) { return (document.cookie.match('(^|; )'+name+'=([^;]*)') || 0)[2]; }
+	
+	var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");			
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			if (xhr.status == 200) {
+				var response = JSON.parse(xhr.responseText),
+					select = document.querySelector('select[name="'+response.unique_id+'"]');
+					
+				select.insertAdjacentHTML('afterend', '<span class="'+response.status+'">'+response.message+'</span>');
+			}
+		} 
+	};
+
+	var select = document.getElementsByTagName('select');
+	[].forEach.call(select, function(status) {
+		status.addEventListener('change', function(e) {
+			var unique_id = e.target.name,
+				status_id = e.target.value,
+				token = getCookie('<?php echo USER_COOKIE; ?>');
+			
+			xhr.open('GET', 'http://local.widget.com/order/updateStatus/?unique_id='+unique_id+'&status_id='+status_id+'&token='+token, true);
+			xhr.send();
+		});
+	});
+
+</script>

@@ -1,0 +1,50 @@
+<style type="text/css">
+	label, input, span { float:left; clear:left; }
+	span { color:red; margin-bottom:20px; }
+</style>
+
+<h1>User Login</h1>
+
+<form id="login" action="/user/login" method="post" name="login">
+	<label for="email">Email</label>
+	<input id="email" type="email" name="email" />
+	<span id="email-error"></span>
+	
+	<label for="password">Password</label>
+	<input id="password" type="password" name="password" />
+	<span id="password-error"></span>
+	
+	<?php if (!empty($error)) { echo '<span>'.$error.'</span>'; } ?>
+	
+	<input type="submit" value="Log In" />
+</form>
+
+<script type="text/javascript">
+	document.getElementById('login').addEventListener('submit', function(e) {
+		var email = document.getElementById('email'),
+			emailError = document.getElementById('email-error'),
+			password = document.getElementById('password'),
+			passwordError = document.getElementById('password-error'),
+			validEmail = /\S+@\S+\.\S+/,
+			error = false;
+		
+		if (!validEmail.test(email.value)) {
+			emailError.innerHTML = 'Email is invalid';
+			error = true;
+		}
+		
+		if (!email.value) {
+			emailError.innerHTML = 'Email is required';
+			error = true;
+		}
+		
+		if (!password.value) {
+			passwordError.innerHTML = 'Password is required';
+			error = true;
+		}
+		
+		if (error) {
+			e.preventDefault();
+		}
+	});
+</script>
